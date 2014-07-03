@@ -48,10 +48,10 @@ def card_name(card)
   card_name + ' of ' + suit_name
 end
 
-def show_cards(name, hand, hide_second_card = false)
+def show_cards(name, hand, hide_dealer_card = false)
   print "#{name} cards: " 
   hand.each_with_index do |card, i|
-    if i == 0 && hide_second_card
+    if i == 0 && hide_dealer_card
       print 'XXXXXXXXXXX'
     else
       print card_name(card)
@@ -59,6 +59,8 @@ def show_cards(name, hand, hide_second_card = false)
 
     print ', ' if i < hand.size - 1
   end
+
+  print "\t Total: " + get_total(hand).to_s if !hide_dealer_card
 
   puts "\n\n"
 end
