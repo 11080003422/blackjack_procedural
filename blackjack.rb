@@ -129,6 +129,25 @@ def decide_dealer_action(hand)
   'stand'    
 end
 
+def print_result
+  case result
+  when 0
+    puts "Tie!"
+  when 1
+    puts "Blackjack! You won!"
+  when 2
+    puts "Blackjack, you lost!"
+  when 3
+    puts "You busted."
+  when 4
+    puts "Dealer busted, you won!"
+  when 5
+    puts "You won!"
+  when 6
+    puts "Dealer won."
+  end
+end
+
 # Start of the program flow
 
 deck = []
@@ -180,21 +199,4 @@ begin
 end until user_standing && dealer_standing
 
 show_cards(user, dealer, false)
-result = get_result(user, dealer)
-
-case result
-when 0
-  puts "Tie!"
-when 1
-  puts "Blackjack! You won!"
-when 2
-  puts "Blackjack, you lost!"
-when 3
-  puts "You busted."
-when 4
-  puts "Dealer busted, you won!"
-when 5
-  puts "You won!"
-when 6
-  puts "Dealer won."
-end
+print_result(get_result(user, dealer))
