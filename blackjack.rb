@@ -95,9 +95,11 @@ def get_result(user_hand, dealer_hand)
 
   # Check for blackjack
   if user_total == 11 && has_ace?(user_hand)
-    return 1 # user blackjack
+    return 1 if user_hand.count == 2 # user blackjack
+    return 7
   elsif dealer_total == 11 && has_ace?(dealer_hand)
-    return 2 # dealer blackjack
+    return 2 if dealer_hand.count == 2 # dealer blackjack
+    return 8
   end
 
   # Check for bust    
@@ -145,6 +147,10 @@ def print_result
     puts "You won!"
   when 6
     puts "Dealer won."
+  when 7
+    puts "21, you won!"
+  when 8
+    puts "21, dealer won."
   end
 end
 
