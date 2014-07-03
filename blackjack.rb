@@ -48,28 +48,25 @@ def card_name(card)
   card_name + ' of ' + suit_name
 end
 
-def show_cards(user_hand, dealer_hand, hide_dealer = true)
-  system 'clear' or system 'cls'
-  print 'Dealer cards: '
-  dealer_hand.each_with_index do |card, i|
-    if i == 0 && hide_dealer
+def show_cards(name, hand, hide_second_card = false)
+  print "#{name} cards: " 
+  hand.each_with_index do |card, i|
+    if i == 0 && hide_second_card
       print 'XXXXXXXXXXX'
     else
       print card_name(card)
     end
 
-    print ', ' if i < dealer_hand.size - 1
+    print ', ' if i < hand.size - 1
   end
 
   puts "\n\n"
+end
 
-  print 'User cards: '
-  user_hand.each_with_index do |card, i|
-    print card_name(card)
-    print ', ' if i < user_hand.size - 1
-  end
-
-  puts "\n\n"
+def show_table(user_hand, dealer_hand, hide_dealer = true)
+  system 'clear' or system 'cls'
+  show_cards("Dealer", dealer_hand, hide_dealer)
+  show_cards("User", user_hand)
 end
 
 def get_total(hand)
@@ -84,39 +81,6 @@ def has_ace?(hand)
   false
 end
 
-def get_result(user_hand, dealer_hand)
-  user_total = get_total(user_hand)
-  dealer_total = get_total(dealer_hand)
-
-  # Check for tie
-  if (user_total == dealer_total)
-    return 0 # tie
-  end
-
-  # Check for blackjack
-  if user_total == 11 && has_ace?(user_hand)
-    return 1 if user_hand.count == 2 # user blackjack
-    return 7
-  elsif dealer_total == 11 && has_ace?(dealer_hand)
-    return 2 if dealer_hand.count == 2 # dealer blackjack
-    return 8
-  end
-
-  # Check for bust    
-  if (user_total > 21)
-    return 3 # user bust
-  elsif (dealer_total > 21)
-    return 4 # dealer bust
-  end
-
-  # Check for win
-  if user_total > dealer_total
-    return 5 # user win
-  elsif user_total < dealer_total
-    return 6 # dealer win
-  end
-end
-
 def decide_dealer_action(hand)
   dealer_total = get_total(hand)
 
@@ -126,32 +90,9 @@ def decide_dealer_action(hand)
     dealer_total += 10
   end
 
-  return 'h' if dealer_total < 17
+  return 'h' if dealer_total < 17 # hit
 
-  'stand'    
-end
-
-def print_result
-  case result
-  when 0
-    puts "Tie!"
-  when 1
-    puts "Blackjack! You won!"
-  when 2
-    puts "Blackjack, you lost!"
-  when 3
-    puts "You busted."
-  when 4
-    puts "Dealer busted, you won!"
-  when 5
-    puts "You won!"
-  when 6
-    puts "Dealer won."
-  when 7
-    puts "21, you won!"
-  when 8
-    puts "21, dealer won."
-  end
+  's' # stand
 end
 
 # Start of the program flow
@@ -167,42 +108,58 @@ dealer << get_card(deck)
 user << get_card(deck)
 dealer << get_card(deck)
 
-user_standing = dealer_standing = (get_total(user) == 11 && has_ace?(user)) || (get_total(dealer) == 11 && has_ace?(dealer)) ? true : false
+if get_total(user) == 21 && get_total(dealer) == 21
+  puts "Tie."
+  exit
+end
 
-begin
-  show_cards(user, dealer)
+while true
+  show_table(user, dealer)
+  user_total = get_total(user)
 
-  if (!user_standing)
-    puts "(H)it or (S)tand?"
-    user_action = gets.chomp.downcase
+  if user_total == 21
+    puts "Blackjack, you won!"
+    exit
+  elsif user_total > 21
+    puts "You are busted, dealer won."
+    exit
+  end
 
-    if (user_action == 'h')
-      user << get_card(deck)
+  puts "(H)it or (S)tand?"
+  user_action = gets.chomp.downcase
+
+  if user_action == 'h'
+    user << get_card(deck)
+  else
+    break
+  end
+end
+
+while true
+  dealer_total = get_total(dealer)
+
+  if dealer_total == 21
+    puts "Blackjack, dealer won!"
+    exit
+  elsif dealer_total > 21
+    puts "You are busted, dealer won."
+    exit
+  end
+
+  dealer_action = decide_dealer_action(dealer)
+
+  if dealer_action == 'h'
+    dealer << get_card(deck)
+  else
+    show_table(user, dealer, false)
+
+    if user_total == dealer_total
+      puts "Tie."
+    elsif user_total > dealer_total
+      puts "You won!"
     else
-      user_standing = true
+      puts "Dealer won."
     end
+    exit
   end
-
-  if (get_total(user) >= 21)
-    user_standing = dealer_standing = true
-    next
-  end
-
-  if (!dealer_standing)
-    dealer_action = decide_dealer_action(dealer)
-
-    if (dealer_action == 'h')
-      dealer << get_card(deck)
-    else
-      dealer_standing = true
-    end
-  end
-
-  if (get_total(dealer) >= 21)
-    user_standing = dealer_standing = true
-    next
-  end
-end until user_standing && dealer_standing
-
-show_cards(user, dealer, false)
-print_result(get_result(user, dealer))
+end
