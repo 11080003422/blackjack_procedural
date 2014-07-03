@@ -1,33 +1,3 @@
-# keep cards in a hash
-# keep deck in an array
-
-# create the deck
-# user gets a card
-# dealer gets a card
-# user gets a card
-# dealer gets a card
-# player can see dealer's first card
-
-# until someone busts or wins
-#   player can choose to hit or stay, if not already stayed
-
-#   if player stays
-#     dealer decides what to do
-#     check if busts or wins
-
-#   if player hits
-#     player gets a card
-#     check if busts or wins
-#     dealer decides what to do
-#     check if busts or wins
-
-
-# dealer decision
-#   if cards < 17 hit
-#   else stay
-
-require 'pry'
-
 class Array
   def sample!
     delete_at rand length
@@ -45,7 +15,6 @@ def initialize_deck(deck)
 end
 
 def get_card(deck)
-  # TODO: What happens if there are no cards?
   deck.sample!
 end
 
@@ -76,7 +45,6 @@ def card_name(card)
     card_name = 'King'        
   end
 
-  # binding.pry
   card_name + ' of ' + suit_name
 end
 
